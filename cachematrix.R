@@ -5,18 +5,23 @@
 ## a new object which is actually a list of 4 functions to, respectively, set 
 ## and get the value of the matrix and set and get the value of its inverse.
 
-makeCacheMatrix <- function(x = matrix()) {
-  m <- NULL
-  set <- function(y) {
-    x <<- y
-    m <<- NULL
+makeCacheMatrix <- function(originalmat = matrix()) {
+  inversemat <- NULL
+  
+  setMatrix <- function(x) {
+    originalmat <<- x
+    inversemat <<- NULL
   }
-  get <- function() x
-  setSolve <- function(mean) m <<- mean
-  getSolve <- function() m
-  list(set = set, get = get,
-       setSolve = setSolve,
-       getSolve = getSolve)
+  
+  getMatrix <- function() originalmat
+  
+  setInv <- function(inverse) inversemat <<- inverse
+  
+  getInv <- function() inversemat
+  
+  list(setMatrix = setMatrix, getMatrix = getMatrix,
+       setInv = setInv,
+       getInv = getInv)
 }
 
 
@@ -25,13 +30,22 @@ makeCacheMatrix <- function(x = matrix()) {
 ## cache. 
 
 cacheSolve <- function(x, ...) {
-  inversemat <- x$getSolve()
+  # Checking the cache
+  inversemat <- x$getInv()
   if(!is.null(inversemat)) {
     message("Getting cached matrix")
     return(inversemat)
   }
-  originalmat <- x$get()
+  
+  # Getting the matrix to inverte
+  originalmat <- x$getMatrix()
+  
+  # Calculating the inverse
   inversemat <- solve(originalmat, ...)
-  x$setSolve(inversemat)
+  
+  # Setting the inverse
+  x$setInv(inversemat)
+  
+  # Returning the inverse
   inversemat
 }
